@@ -5,7 +5,7 @@ Base = declarative_base()
 
 
 class AuthorizedRole(Base):
-    __tablename__ = 'authorized_role'
+    __tablename__ = 'Authorized_role'
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
