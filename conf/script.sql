@@ -13,10 +13,12 @@ create table Event
 (
     id           int auto_increment
         primary key,
-    id_message   varchar(50) null,
-    date_closure datetime    null,
-    max_user     int         null,
-    users        json        null,
+    id_message   varchar(50)          null,
+    date_closure datetime             null,
+    max_user     int                  null,
+    users        text                 null,
+    type         varchar(255)         not null,
+    open         tinyint(1) default 1 null,
     constraint event_id_message_uindex
         unique (id_message)
 );
@@ -31,5 +33,4 @@ create table User
 
 alter table User
     add primary key (id);
-
 
