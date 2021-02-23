@@ -37,7 +37,7 @@ bot = commands.Bot(command_prefix=BOT_PREFIX, intents=intents, description="!hel
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Streaming(name='Sert des rafraichissement et des !help'))
+    await bot.change_presence(activity=discord.Game(name="Servire des rafraichissement et des !help"))
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
