@@ -232,4 +232,3 @@ dmypy.json
 .prof
 
 # End of https://www.toptal.com/developers/gitignore/api/pycharm+all,python
-conf/app.env
