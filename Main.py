@@ -7,19 +7,26 @@ from datetime import datetime
 from Business.Models.AuthorizedRole import AuthorizedRole
 from Business.Models.Event import Event
 from discord.ext import commands
+from dotenv import load_dotenv
+import logging
+import os
+import mysql
 
-DISCORD_TOKEN = "NzgwNDg5MzIwNTgyNjEwOTk0.X7v1Ug.vupp97razj8HRDXVeMhwtGZEgoc"
-MYSQL_DIALECT = "mysql"
-MYSQL_DRIVER = "mysqlconnector"
-MYSQL_USER = "admin"
-MYSQL_PWD = "IKhVvZVl0yZLgD3"
-MYSQL_HOST = "localhost"
-MYSQL_PORT = "3306"
-MYSQL_DB = "bot_database"
-BOT_PREFIX = "!"
+load_dotenv("conf/app.env")
+logging.basicConfig(level=logging.DEBUG)
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+MYSQL_DIALECT = os.getenv("MYSQL_DIALECT")
+MYSQL_DRIVER = os.getenv("MYSQL_DRIVER")
+MYSQL_USER = os.getenv("MYSQL_USER")
+MYSQL_PWD = os.getenv("MYSQL_PWD")
+MYSQL_HOST = os.getenv("MYSQL_HOST")
+MYSQL_PORT = os.getenv("MYSQL_PORT")
+MYSQL_DB = os.getenv("MYSQL_DB")
+BOT_PREFIX = os.getenv("BOT_PREFIX")
 
 engine = create_engine(
-    f"{MYSQL_DIALECT}+{MYSQL_DRIVER}://{MYSQL_USER}:{MYSQL_PWD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}", echo=True)
+    f"{MYSQL_DIALECT}+{MYSQL_DRIVER}://{MYSQL_USER}:{MYSQL_PWD}@{MYSQL_HOST}:{MYSQL_PORT.__str__()}/{MYSQL_DB}",
+    echo=True)
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -122,7 +129,12 @@ async def closeEventRegister(ctx, event_id):
 @bot.command(descritption="s'inscrire a un event")
 async def register(ctx, event_id):
     event = session.query(Event).get(event_id)
-    if event.open and len(event.users.split(',')) < event.max_user:
+    registered_users = event.users.split(',')
+    if event.open and len(registered_users) < event.max_user:
+        if str(ctx.author.id) in registered_users:
+            await (await ctx.channel.send("Vous etes deja inscrit a cet evenement")).delete(delay=30)
+            await ctx.message.delete(delay=30)
+            return
         event.users += f',{ctx.author.id}'
         session.add(event)
         session.commit()
