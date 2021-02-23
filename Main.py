@@ -13,7 +13,7 @@ import os
 import mysql
 
 load_dotenv("conf/app.env")
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 MYSQL_DIALECT = os.getenv("MYSQL_DIALECT")
 MYSQL_DRIVER = os.getenv("MYSQL_DRIVER")
@@ -32,12 +32,12 @@ session = Session()
 
 intents = discord.Intents.default()
 
-bot = commands.Bot(command_prefix=BOT_PREFIX, intents=intents, description="desc")
+bot = commands.Bot(command_prefix=BOT_PREFIX, intents=intents, description="!help")
 
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Streaming(name="Sert des rafraichissement et des !help"))
+    await bot.change_presence(activity=discord.Streaming(name='Sert des rafraichissement et des !help'))
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
