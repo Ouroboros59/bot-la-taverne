@@ -74,12 +74,9 @@ async def create_embed_inscr(event):
     return embed
 
 
-@bot.command()
-async def test(ctx, msg):
-    await ctx.send(msg)
-
-
-@bot.command(descritption="ajouter un role authorisé a utiliser les commandes d'animation")
+@bot.command(brief="Ajouter un role authorisé a utiliser les commandes d'animation",
+             help="Ajouter un role authorisé a utiliser les commandes d'animation: \r"
+                  "{BOT_PREFIX}addRole @role")
 async def addRole(ctx, *, role: discord.Role):
     if is_admin(ctx.author):
         role = AuthorizedRole(id=role.id, name=role.name)
@@ -96,7 +93,9 @@ async def addRole(ctx, *, role: discord.Role):
         await ctx.channel.send('You don\'t have permission to use this command')
 
 
-@bot.command(descritption="Créer une liste d'inscritpion pour un evenement")
+@bot.command(brief="Créer une liste d'inscritpion pour un evenement",
+             help="Créer une liste d'inscritpion pour un evenement: \r  "
+                  f"{BOT_PREFIX}createEvent type max_player heure_fin_inscription date_fin_inscription")
 async def createEvent(ctx, game, count, hour, date):
     if is_animator(ctx.author):
         date = date.split("/")
@@ -114,7 +113,10 @@ async def createEvent(ctx, game, count, hour, date):
         await ctx.channel.send('You don\'t have permission to use this command')
 
 
-@bot.command(descritption="fermer une liste d'inscritpion pour un evenement")
+@bot.command(brief="Fermer une liste d'inscritpion pour un evenement",
+             help="Fermer une liste d'inscritpion pour un evenement: \r  "
+                  f"{BOT_PREFIX}closeEventRegister event_id"
+             )
 async def closeEventRegister(ctx, event_id):
     if is_animator(ctx.author):
         event = session.query(Event).get(event_id)
@@ -126,7 +128,10 @@ async def closeEventRegister(ctx, event_id):
         await ctx.channel.send('You don\'t have permission to use this command')
 
 
-@bot.command(descritption="s'inscrire a un event")
+@bot.command(brief="S'inscrire a un event",
+             help="S'inscrire a un event: \r  "
+                  f"{BOT_PREFIX}register event_id"
+             )
 async def register(ctx, event_id):
     event = session.query(Event).get(event_id)
     registered_users = event.users.split(',')
@@ -145,7 +150,10 @@ async def register(ctx, event_id):
         await ctx.channel.send("les inscritpion a cet evenement sont deja terminée ou la liste est pleine")
 
 
-@bot.command(descritption="se désinscrire d'un event")
+@bot.command(brief="Se désinscrire d'un event",
+             help="Se désinscrire d'un event: \r  "
+                  f"{BOT_PREFIX}unregister event_id"
+             )
 async def unregister(ctx, event_id):
     event = session.query(Event).get(event_id)
     event.users = event.users.replace(f'{ctx.author.id},', '')
