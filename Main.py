@@ -155,7 +155,11 @@ async def unregister(ctx, event_id):
     event.users = event.users.replace(f'{ctx.author.id},', '')
     session.add(event)
     session.commit()
-    msg = await ctx.channel.fetch_message(event.id_message)
+    if len(event.users.split(',')) < event.max_user:
+        color = 0x16b826
+    else:
+        color = 0xf57c17
+    msg = await ctx.channel.fetch_message(event.id_message, color)
     await msg.edit(embed=await create_embed_inscr(event))
     await ctx.message.delete()
 
