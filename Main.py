@@ -60,7 +60,8 @@ def is_animator(user):
 async def create_embed_inscr(event, color):
     user_list = ''
     for id_user in event.users.split(','):
-        user_list += f'• <@{id_user}>\r'
+        if id_user != "":
+            user_list += f'• <@{id_user}>\r'
     user_list += '\u200b'
 
     embed = discord.Embed(title='**Liste d\'inscription**',
@@ -72,7 +73,7 @@ async def create_embed_inscr(event, color):
     if not event.open:
         embed.add_field(name='**Statut**', value='Inscription fermée', inline=False)
         return embed
-    if len(event.users.split(',')) < event.max_user:
+    if len(event.users.split(','))-1 < event.max_user:
         embed.add_field(name='**Statut**', value='Inscription ouverte', inline=False)
     else:
         embed.add_field(name='**Statut**', value='Inscription pleine', inline=False)
@@ -87,6 +88,7 @@ async def addRole(ctx, *, role: discord.Role):
             role = AuthorizedRole(id=role.id, name=role.name)
             session.add(role)
             session.commit()
+            session.flush()
             await ctx.channel.send('Role <@&' + str(session.query(AuthorizedRole.id)[0].id) + '> registered!')
         else:
             await ctx.channel.send('Role <@&'
@@ -102,14 +104,16 @@ async def createEvent(ctx, game, count, hour, date):
         date = date.split('/')
         hour = hour.split('h')
         date_end = datetime(int(date[2]), int(date[1]), int(date[0]), int(hour[0]), int(hour[1]))
-        event = Event(date_closure=date_end, users=f'{ctx.author.id}', max_user=count, type=game)
+        event = Event(date_closure=date_end, users=f'{ctx.author.id},', max_user=count, type=game)
         session.add(event)
         session.commit()
+        session.flush()
 
         id_message = await ctx.channel.send(embed=await create_embed_inscr(event, 0x16b826))
         event.id_message = id_message.id
         session.add(event)
         session.commit()
+        session.flush()
     else:
         await ctx.channel.send('You don\'t have permission to use this command')
 
@@ -130,16 +134,17 @@ async def closeEventRegister(ctx, event_id):
 async def register(ctx, event_id):
     event = session.query(Event).get(event_id)
     registered_users = event.users.split(',')
-    if event.open and len(registered_users) < event.max_user:
+    if event.open and len(registered_users)-1 < event.max_user:
         if str(ctx.author.id) in registered_users:
             await (await ctx.channel.send('Tu es déjà inscrit.e à cet événement')).delete(delay=30)
             await ctx.message.delete(delay=30)
             return
-        event.users += f',{ctx.author.id}'
+        event.users += f'{ctx.author.id},'
         session.add(event)
         session.commit()
+        session.flush()
         msg = await ctx.channel.fetch_message(event.id_message)
-        if len(event.users.split(',')) < event.max_user:
+        if len(event.users.split(','))-1 < event.max_user:
             color = 0x16b826
         else:
             color = 0xf57c17
@@ -155,19 +160,19 @@ async def unregister(ctx, event_id):
     event.users = event.users.replace(f'{ctx.author.id},', '')
     session.add(event)
     session.commit()
-    if len(event.users.split(',')) < event.max_user:
+    if len(event.users.split(','))-1 < event.max_user:
         color = 0x16b826
     else:
         color = 0xf57c17
-    msg = await ctx.channel.fetch_message(event.id_message, color)
-    await msg.edit(embed=await create_embed_inscr(event))
+    msg = await ctx.channel.fetch_message(event.id_message)
+    await msg.edit(embed=await create_embed_inscr(event, color))
     await ctx.message.delete()
 
 
 @bot.command()
 async def help(ctx):
     embed = discord.Embed(title='Voici la liste des commandes disponibles',
-                          description=open('conf/help', 'r', encoding='utf8').read()+'\r\u200b',
+                          description=open('conf/help', 'r', encoding='utf8').read() + '\r\u200b',
                           color=0xAD33E9
                           )
 
