@@ -13,7 +13,7 @@ import os
 import mysql
 
 load_dotenv("conf/app.env")
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 MYSQL_DIALECT = os.getenv("MYSQL_DIALECT")
 MYSQL_DRIVER = os.getenv("MYSQL_DRIVER")
