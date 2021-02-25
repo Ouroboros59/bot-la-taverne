@@ -33,11 +33,12 @@ session = Session()
 intents = discord.Intents.default()
 
 bot = commands.Bot(command_prefix=BOT_PREFIX, intents=intents, description="desc")
+bot.remove_command('help')
 
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Streaming(name="Sert des rafraichissement et des !help"))
+    await bot.change_presence(activity=discord.Game(name=f"Boire l'apéro avec {BOT_PREFIX}help"))
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
@@ -148,7 +149,7 @@ async def register(ctx, event_id):
         await msg.edit(embed=await create_embed_inscr(event))
         await ctx.message.delete()
     else:
-        await ctx.channel.send("les inscritpion a cet evenement sont deja terminée ou la liste est pleine")
+        await ctx.channel.send("Les inscription a cet evenement sont deja terminée ou la liste est pleine")
 
 
 @bot.command(brief="Se désinscrire d'un event",
@@ -162,6 +163,33 @@ async def unregister(ctx, event_id):
     session.commit()
     msg = await ctx.channel.fetch_message(event.id_message)
     await msg.edit(embed=await create_embed_inscr(event))
+    await ctx.message.delete()
+
+
+@bot.command(brief="Affiche la liste des commandes ainsi que leur descriptif",
+             help="Affiche la liste des commandes ainsi que leur descriptif: \r  "
+                  f"{BOT_PREFIX}help"
+             )
+async def help(ctx):
+    embed = discord.Embed(title='Voici la liste des commandes disponibles',
+                          description='**__Commandes utilisateur :__**\n• ``_help`` - Affiche la liste des commandes '
+                                      'ainsi que leur descriptif.\n• ``_register {numéro de l\'event}`` - S\'inscrire '
+                                      'à un event précis.\n• ``_unregister {numéro de l\'event}`` - Se désinscrire '
+                                      'd\'un event précis.\n\n**__Commandes avancées :__**\n• ``_createEvent {nom} {'
+                                      'nombre de personne} {heure} {date jj/mm/aaaa}`` - Crée une liste '
+                                      'd\’inscription pour un event.\n• ``_closeEventRegister {numéro de l\'event}`` '
+                                      '- Ferme la liste d\’inscription d\'un event précis.\n\n**__Commandes admin '
+                                      ':__**\n• ``_addRole {nom du rôle}`` - Ajoute un rôle autorisé à utiliser les '
+                                      'commandes avancées.',
+                          color=0xAD33E9
+                          )
+
+    embed.set_author(name='Le Tavernier', url='https://mrdoob.com/projects/chromeexperiments/google-gravity/',
+                     icon_url="https://cdn.discordapp.com/avatars/780489320582610994/1b1613457d8bde8de158baf95ad42ecd"
+                              ".png?size=4096")
+
+    embed.set_footer(text=f'À la prochaine {ctx.author.display_name} pour boire un verre avec moi 🍻')
+    await ctx.channel.send(embed=embed)
     await ctx.message.delete()
 
 
