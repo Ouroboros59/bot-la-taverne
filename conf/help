@@ -1,0 +1,12 @@
+
+**__Commandes utilisateur :__**
+• ``help`` - Affiche la liste des commandes ainsi que leur descriptif.
+• ``register {numéro de l'event}`` - S'inscrire à un event précis.
+• ``unregister {numéro de l'event}`` - Se désinscrire d'un event précis.
+
+**__Commandes avancées :__**
+• ``createEvent {nom} {nombre de personne} {heure} {date jj/mm/aaaa}`` - Crée une liste d’inscription pour un event.
+• ``closeEventRegister {numéro de l'event}`` - Ferme la liste d’inscription d'un event précis.
+
+**__Commandes admin :__**
+• ``addRole {nom du rôle}`` - Ajoute un rôle autorisé à utiliser les commandes avancées.

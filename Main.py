@@ -172,18 +172,10 @@ async def unregister(ctx, event_id):
              )
 async def help(ctx):
     embed = discord.Embed(title='Voici la liste des commandes disponibles',
-                          description='**__Commandes utilisateur :__**\n• ``_help`` - Affiche la liste des commandes '
-                                      'ainsi que leur descriptif.\n• ``_register {numéro de l\'event}`` - S\'inscrire '
-                                      'à un event précis.\n• ``_unregister {numéro de l\'event}`` - Se désinscrire '
-                                      'd\'un event précis.\n\n**__Commandes avancées :__**\n• ``_createEvent {nom} {'
-                                      'nombre de personne} {heure} {date jj/mm/aaaa}`` - Crée une liste '
-                                      'd\’inscription pour un event.\n• ``_closeEventRegister {numéro de l\'event}`` '
-                                      '- Ferme la liste d\’inscription d\'un event précis.\n\n**__Commandes admin '
-                                      ':__**\n• ``_addRole {nom du rôle}`` - Ajoute un rôle autorisé à utiliser les '
-                                      'commandes avancées.',
+                          description=open('conf/help', 'r', encoding='utf8').read(),
                           color=0xAD33E9
                           )
-
+    embed.add_field(name="Préfixe du bot", value=BOT_PREFIX, inline=False)
     embed.set_author(name='Le Tavernier', url='https://mrdoob.com/projects/chromeexperiments/google-gravity/',
                      icon_url="https://cdn.discordapp.com/avatars/780489320582610994/1b1613457d8bde8de158baf95ad42ecd"
                               ".png?size=4096")
