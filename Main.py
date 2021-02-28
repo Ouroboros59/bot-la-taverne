@@ -28,7 +28,6 @@ engine = create_engine(
     f'{MYSQL_DIALECT}+{MYSQL_DRIVER}://{MYSQL_USER}:{MYSQL_PWD}@{MYSQL_HOST}:{MYSQL_PORT.__str__()}/{MYSQL_DB}',
     echo=True)
 Session = sessionmaker(bind=engine)
-session = Session()
 
 intents = discord.Intents.default()
 
@@ -50,10 +49,13 @@ def is_admin(user):
 
 
 def is_animator(user):
+    session = Session()
     authorizedroles = session.query(AuthorizedRole).all()
     for role in authorizedroles:
         if discord.utils.get(user.roles, name=role.name) is not None:
+            session.close()
             return True
+    session.close()
     return False
 
 
@@ -82,6 +84,7 @@ async def create_embed_inscr(event, color):
 
 @bot.command()
 async def addRole(ctx, *, role: discord.Role):
+    session = Session()
     if is_admin(ctx.author):
         role = AuthorizedRole(id=role.id, name=role.name)
         if session.query(AuthorizedRole).get(role.id) is None:
@@ -96,10 +99,12 @@ async def addRole(ctx, *, role: discord.Role):
                                    '> has already been registered!')
     else:
         await ctx.channel.send('You don\'t have permission to use this command')
+    session.close()
 
 
 @bot.command()
 async def createEvent(ctx, game, count, hour, date):
+    session = Session()
     if is_animator(ctx.author):
         date = date.split('/')
         hour = hour.split('h')
@@ -116,10 +121,12 @@ async def createEvent(ctx, game, count, hour, date):
         session.flush()
     else:
         await ctx.channel.send('You don\'t have permission to use this command')
+    session.close()
 
 
 @bot.command()
 async def closeEventRegister(ctx, event_id):
+    session = Session()
     if is_animator(ctx.author):
         event = session.query(Event).get(event_id)
         event.open = False
@@ -128,16 +135,19 @@ async def closeEventRegister(ctx, event_id):
         await ctx.message.delete()
     else:
         await ctx.channel.send('You don\'t have permission to use this command')
+    session.close()
 
 
 @bot.command()
 async def register(ctx, event_id):
+    session = Session()
     event = session.query(Event).get(event_id)
     registered_users = event.users.split(',')
     if event.open and len(registered_users)-1 < event.max_user:
         if str(ctx.author.id) in registered_users:
             await (await ctx.channel.send('Tu es déjà inscrit.e à cet événement')).delete(delay=30)
             await ctx.message.delete(delay=30)
+            session.close()
             return
         event.users += f'{ctx.author.id},'
         session.add(event)
@@ -152,14 +162,17 @@ async def register(ctx, event_id):
         await ctx.message.delete()
     else:
         await ctx.channel.send('Pour cet événement soit la liste est pleine, soit les inscriptions sont terminées')
+    session.close()
 
 
 @bot.command()
 async def unregister(ctx, event_id):
+    session = Session()
     event = session.query(Event).get(event_id)
     event.users = event.users.replace(f'{ctx.author.id},', '')
     session.add(event)
     session.commit()
+    session.flush()
     if len(event.users.split(','))-1 < event.max_user:
         color = 0x16b826
     else:
@@ -167,6 +180,7 @@ async def unregister(ctx, event_id):
     msg = await ctx.channel.fetch_message(event.id_message)
     await msg.edit(embed=await create_embed_inscr(event, color))
     await ctx.message.delete()
+    session.close()
 
 
 @bot.command()
