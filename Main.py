@@ -67,7 +67,7 @@ async def create_embed_inscr(event, color):
     user_list += '\u200b'
 
     embed = discord.Embed(title='**Liste d\'inscription**',
-                          description=f'Partie de {event.type} du {event.date_closure.strftime("%d/%m/%Y à %H:%m")}\n\n '
+                          description=f'Partie de {event.type} du {event.date_closure.strftime("%d/%m/%Y à %H:%M")}\n\n '
                                       f'__Pour s\'inscrire__**:** `{BOT_PREFIX}register {event.id}`\n'
                                       f'__Pour se désinscrire__**:** ``{BOT_PREFIX}unregister {event.id}\r``\u200b',
                           color=color)
