@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   db:
-    image: library/mysql:latest
+    image: library/mysql:8.0.23
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
