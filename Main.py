@@ -124,6 +124,7 @@ async def createAmongUs(ctx):
     print(await user_exist("176336919431479296", session))
 
 
+@bot.command()
 async def help(ctx):
     embed = discord.Embed(title='Voici la liste des commandes disponibles',
                           description=open('conf/help', 'r', encoding='utf8').read() + '\r\u200b',
