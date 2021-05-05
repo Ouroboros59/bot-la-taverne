@@ -1,7 +1,7 @@
 import re
 from datetime import datetime
 
-from Business.Models.models import Event, User_event
+from Business.Models.models import *
 from Business.Utils.utils import *
 
 
@@ -18,13 +18,12 @@ async def on_ready():
 async def addRole(ctx, *, role: discord.Role):
     session = Session()
     if is_admin(ctx.author):
-        role = AuthorizedRole(id=role.id, name=role.name)
-        if session.query(AuthorizedRole).get(role.id) is None:
-            role = AuthorizedRole(id=role.id, name=role.name)
+        if session.query(AuthorizedRole).get(role.id.__str__()) is None:
+            role = AuthorizedRole(id=role.id.__str__(), name=role.name)
             session.add(role)
             session.commit()
             session.flush()
-            await ctx.channel.send('Role <@&' + str(session.query(AuthorizedRole.id)[0].id) + '> registered!')
+            await ctx.channel.send('Role <@&' + str(role.id) + '> registered!')
         else:
             await ctx.channel.send('Role <@&'
                                    + str(session.query(AuthorizedRole).get(role.id).id) +
@@ -42,13 +41,13 @@ async def createEvent(ctx, game, count, hour, date):
         hour = hour.split('h')
         date_end = datetime(int(date[2]), int(date[1]), int(date[0]), int(hour[0]), int(hour[1]))
         event = Event(date_closure=date_end, max_user=count, type=game)
-        event.users.append(await user_exist(ctx.author.id, session))
+        event.users.append(await user_exist(ctx.author.id.__str__(), session))
         session.add(event)
         session.commit()
         session.flush()
         await ctx.message.delete()
         id_message = await ctx.channel.send(embed=await create_embed_inscr(event, 0x16b826))
-        event.id_message = id_message.id
+        event.id_message = id_message.id.__str__()
         session.add(event)
         session.commit()
         session.flush()
@@ -84,7 +83,7 @@ async def register(ctx, event_id):
             await ctx.message.delete(delay=30)
             session.close()
             return
-        event.users.append(await user_exist(ctx.author.id, session))
+        event.users.append(await user_exist(ctx.author.id.__str__(), session))
         session.add(event)
         session.commit()
         session.flush()
@@ -121,7 +120,11 @@ async def unregister(ctx, event_id):
 @bot.command()
 async def createAmongUs(ctx):
     session = Session()
-    print(await user_exist("176336919431479296", session))
+    impostor = ctx.message.raw_mentions
+    channel = ctx.author.voice.channel
+    voice_channel = discord.utils.get(ctx.server.channels, id=channel)
+    print(voice_channel)
+
 
 
 @bot.command()

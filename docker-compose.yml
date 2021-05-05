@@ -1,18 +1,17 @@
 version: '3.3'
 services:
-  db:
-    image: library/mysql:8.0.23
-    restart: always
+  postgres:
+    container_name: postgres
+    image: postgres
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: IKhVvZVl0yZLgD3
-      MYSQL_DATABASE: bot_database
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: IKhVvZVl0yZLgD3
+      PGDATA: /data/postgres
     ports:
-      - '3306:3306'
+      - '5432:5432'
     expose:
-      - '3306'
+      - '5432'
     volumes:
-      - my-db:/var/lib/mysql
+      - postgres:/data/postgres
 volumes:
-  my-db:
+  postgres:
