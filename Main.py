@@ -123,6 +123,8 @@ async def reportEvent(ctx):
         session = Session()
         msg = ctx.message.content.replace(f'{BOT_PREFIX}reportEvent ', '')
         reportData = await parseReport(msg, session)
+        if reportData is None:
+            raise
         session.add(reportData)
         session.commit()
         session.flush()
@@ -130,6 +132,21 @@ async def reportEvent(ctx):
         await ctx.channel.send(embed=await create_embed_report(reportData))
     except:
         await ctx.channel.send('Erreur lors du parsing, vérifier le message')
+
+
+@bot.command()
+async def getEventResult(ctx, event_id):
+    session = Session()
+    event = session.query(Event).get(event_id)
+    await ctx.message.delete()
+    if event is not None:
+        if event.report is not None:
+            await ctx.channel.send(embed=await create_embed_report(event.report))
+        else:
+            await ctx.channel.send(f'OOPS!, il semblerait que l\'événement n°{event_id} ne soit pas encore terminé')
+    else:
+        await ctx.channel.send(f'OOPS!, il semblerait que l\'événement n°{event_id} n\'éxiste pas')
+
 
 
 @bot.command()

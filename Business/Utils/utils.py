@@ -41,11 +41,12 @@ async def parseReport(msg, session):
     if '\n' in msg:
         event_id, corps = msg.split('\n', 1)
         event = session.query(Event).get(event_id)
-        report = Report(event=event)
-        report.result = await parseReportData(corps)
-        for userId in report.result:
-            report.users.append(await user_exist(userId, session))
-        return report
+        if event is not None:
+            report = Report(event=event)
+            report.result = await parseReportData(corps)
+            for userId in report.result:
+                report.users.append(await user_exist(userId, session))
+            return report
     return None
 
 
