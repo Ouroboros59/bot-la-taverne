@@ -10,10 +10,15 @@ engine = create_engine(
 
 Base = declarative_base()
 User_event = Table('User_event', Base.metadata,
-                   Column('user_id', String(255), ForeignKey('test.user.id')),
-                   Column('event_id', Integer, ForeignKey('test.event.id')),
+                   Column('user_id', String(255), ForeignKey(DB_SCHEMA + '.user.id')),
+                   Column('event_id', Integer, ForeignKey(DB_SCHEMA + '.event.id')),
                    schema=DB_SCHEMA
                    )
+User_report = Table('User_report', Base.metadata,
+                    Column('user_id', String(255), ForeignKey(DB_SCHEMA + '.user.id')),
+                    Column('report_id', Integer, ForeignKey(DB_SCHEMA + '.report.id')),
+                    schema=DB_SCHEMA
+                    )
 
 
 class User(Base):
@@ -24,6 +29,11 @@ class User(Base):
     events = relationship(
         'Event',
         secondary=User_event,
+        back_populates="users"
+    )
+    reports = relationship(
+        'Report',
+        secondary=User_report,
         back_populates="users"
     )
 
@@ -41,6 +51,7 @@ class Event(Base):
     type = Column(String(255))
     date_closure = Column(TIMESTAMP)
     open = Column(BOOLEAN, default=True)
+    report = relationship("Report", back_populates="event", uselist=False)
     users = relationship(
         "User",
         secondary=User_event,
@@ -49,6 +60,19 @@ class Event(Base):
     def __repr__(self):
         return "<Event(id='%s', id_message='%s, date_closure='%s')>" % (
             self.id, self.id_message, self.date_closure.strftime("%m/%d/%Y, %H:%M:%S"))
+
+
+class Report(Base):
+    __tablename__ = 'report'
+    __table_args__ = {'schema': DB_SCHEMA}
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    result = Column(String(255))
+    event_id = Column(Integer, ForeignKey(DB_SCHEMA+'.event.id'))
+    event = relationship("Event", back_populates="report")
+    users = relationship(
+        "User",
+        secondary=User_report,
+        back_populates="reports")
 
 
 class AuthorizedRole(Base):

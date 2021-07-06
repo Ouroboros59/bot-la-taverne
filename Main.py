@@ -118,13 +118,18 @@ async def unregister(ctx, event_id):
 
 
 @bot.command()
-async def createAmongUs(ctx):
-    session = Session()
-    impostor = ctx.message.raw_mentions
-    channel = ctx.author.voice.channel
-    voice_channel = discord.utils.get(ctx.server.channels, id=channel)
-    print(voice_channel)
-
+async def reportEvent(ctx):
+    try:
+        session = Session()
+        msg = ctx.message.content.replace(f'{BOT_PREFIX}reportEvent ', '')
+        reportData = await parseReport(msg, session)
+        session.add(reportData)
+        session.commit()
+        session.flush()
+        await ctx.message.delete()
+        await ctx.channel.send(embed=await create_embed_report(reportData))
+    except:
+        await ctx.channel.send('Erreur lors du parsing, vérifier le message')
 
 
 @bot.command()
