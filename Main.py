@@ -119,19 +119,20 @@ async def unregister(ctx, event_id):
 
 @bot.command()
 async def reportEvent(ctx):
-    try:
-        session = Session()
-        msg = ctx.message.content.replace(f'{BOT_PREFIX}reportEvent ', '')
-        reportData = await parseReport(msg, session)
-        if reportData is None:
-            raise
-        session.add(reportData)
-        session.commit()
-        session.flush()
-        await ctx.message.delete()
-        await ctx.channel.send(embed=await create_embed_report(reportData))
-    except:
-        await ctx.channel.send('Erreur lors du parsing, vérifier le message')
+    session = Session()
+    if is_animator(ctx.author, session):
+        try:
+            msg = ctx.message.content.replace(f'{BOT_PREFIX}reportEvent ', '')
+            reportData = await parseReport(msg, session)
+            if reportData is None:
+                raise
+            session.add(reportData)
+            session.commit()
+            session.flush()
+            await ctx.message.delete()
+            await ctx.channel.send(embed=await create_embed_report(reportData))
+        except:
+            await ctx.channel.send('Erreur lors du parsing, vérifier le message')
 
 
 @bot.command()
